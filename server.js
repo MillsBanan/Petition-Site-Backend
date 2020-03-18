@@ -10,6 +10,7 @@ async function testDbConnection() {
     try {
         await db.createPool();
         await db.getPool().getConnection();
+
     } catch (err) {
         console.error(`Unable to connect to MySQL: ${err.message}`);
         process.exit(1);

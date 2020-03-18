@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const fs = require('mz/fs');
+const bc = require('bcrypt');
 
 const photoDirectory = './storage/photos/';
 const defaultPhotoDirectory = './storage/default/';
@@ -60,7 +61,8 @@ async function populateDefaultUsers() {
 
 async function changePasswordToHash(user, passwordIndex) {
     // TODO you need to implement "passwords.hash()" yourself, then uncomment the line below.
-    // user[passwordIndex] = await passwords.hash(user[passwordIndex]);
+    const saltRounds = 10;
+    user[passwordIndex] = await bc.hash(user[passwordIndex], saltRounds);
 
     // It is recommended you use a reputable cryptology library to do the actual hashing/comparing for you...
 }

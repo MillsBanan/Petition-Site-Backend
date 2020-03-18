@@ -14,7 +14,7 @@ exports.create = async function(req, res) {
 
     try {
         checkUserData(userData);
-        await users.checkEmailInUse(userData.email);
+        //await users.checkEmailInUse(userData.email);
     } catch {
         res.status(400)
             .send("User data given in body was bad!");

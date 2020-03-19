@@ -11,12 +11,12 @@ exports.loginRequired = async function (req, res, next) {
             res.status(401)
                 .send("Unauthorized")
         } else {
-            req.authenticatedUserId = result[0].user_id.toString();
+            req.authenticatedUserId = result.user_id.toString();
             next();
         }
     } catch(err) {
         res.status(500)
-            .send(`ERROR authenticating user`);
+            .send(`ERROR authenticating user: ${err}`);
     }
 };
 

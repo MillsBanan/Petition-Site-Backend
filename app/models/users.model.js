@@ -28,11 +28,15 @@ exports.login = async function(userData) {
     const conn = await db.getPool().getConnection();
     let auth_token = Date.now().toString();
     auth_token = (await bc.hash(auth_token, 1)).slice(0,32);
+
     const [result] = await conn.query(`SELECT user_id, password FROM User where email = ${conn.escape(userData.email)}`);
+    if (result.length === 0) {
+        return "Invalid E";
+    }
     if (await bc.compare(userData.password, result[0].password)) {
         await conn.query(`UPDATE User SET auth_token = '${auth_token}' WHERE email = ${conn.escape(userData.email)}`);
         return {"userId": result[0].user_id, "token" : auth_token};
     } else {
-        return "Invalid";
+        return "Invalid P";
     }
 };

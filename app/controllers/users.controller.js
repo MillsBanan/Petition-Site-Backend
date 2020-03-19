@@ -49,9 +49,14 @@ exports.login = async function(req, res) {
                 .send("Username and password must not be left blank");
         } else {
             const result = await users.login(userData);
-            if (result === "Invalid") {
+            if (result === "Invalid E") {
                 res.status(400)
-                    .send("ERROR: Invalid password");
+                    .send("ERROR: Invalid email");
+
+            } else if (result === "Invalid P"){
+                res.status(400)
+                    .send("ERROR: Invalid Password");
+
             } else {
                 res.status(200)
                     .send(result);

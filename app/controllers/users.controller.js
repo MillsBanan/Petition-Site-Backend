@@ -66,5 +66,29 @@ exports.login = async function(req, res) {
         res.status(500)
             .send(`ERROR logging in: ${err}`);
     }
-}
+};
 
+exports.logout = async function(req, res) {
+    console.log("Request to logout of the server");
+
+    const userId = req.authenticatedUserId;
+
+    try {
+        if (userId === undefined) {
+            res.status(401)
+                .send();
+        } else {
+            res.status(200)
+                .send();
+        }
+    } catch {
+
+    }
+
+};
+
+exports.viewUser = async function (req, res) {
+
+    const authUserId = req.authenticatedUserId;
+
+};

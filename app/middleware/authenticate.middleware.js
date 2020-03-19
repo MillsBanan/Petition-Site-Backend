@@ -24,5 +24,6 @@ async function findUserByToken(authToken) {
     const conn = await db.getPool().getConnection();
 
     const [result] = await conn.query(`SELECT user_id FROM User WHERE auth_token = '${authToken}'`);
+    conn.release();
     return result;
 }

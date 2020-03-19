@@ -9,6 +9,6 @@ module.exports = function(app) {
         .post(users.login);
     app.route(app.rootUrl + '/users/logout')
         .post(authenticate.loginRequired, users.logout);
-    // app.route(app.rootUrl + '/users/:id')
-    //     .get(authenticate.loginRequired, users.viewUser);
+    app.route(app.rootUrl + '/users/:id')
+        .get(authenticate.loginRequired, users.viewUser);
 };

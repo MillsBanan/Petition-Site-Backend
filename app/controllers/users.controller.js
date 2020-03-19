@@ -87,8 +87,31 @@ exports.logout = async function(req, res) {
 
 };
 
-// exports.viewUser = async function (req, res) {
-//
-//     const authUserId = req.authenticatedUserId;
-//
-// };
+exports.viewUser = async function (req, res) {
+    console.log("Yeet");
+    const authUserId = req.authenticatedUserId;
+    const ownId = authUserId === req.params.id;
+    try {
+        if (req.params.id === undefined) {
+            res.statusMessage = 'User ID cannot be blank';
+            res.status(404)
+                .send();
+        } else {
+            const result = await users.getUser(req.params.id);
+            if (!ownId) {
+                delete result.email;
+            }
+            if (result.city === undefined) {
+                delete result.city;
+            }
+            if (result.country === undefined) {
+                delete result.country;
+            }
+            res.status(200)
+                .send(result);
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+};

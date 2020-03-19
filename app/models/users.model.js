@@ -18,6 +18,7 @@ exports.insert = async function(userData) {
     }
 
     const [result] = await conn.query(`INSERT INTO User (${insert_columns}) VALUES (${insert_values})`);
+    conn.release();
     return result.insertId;
 };
 
@@ -31,13 +32,26 @@ exports.login = async function(userData) {
 
     const [result] = await conn.query(`SELECT user_id, password FROM User where email = ${conn.escape(userData.email)}`);
     if (result.length === 0) {
+        conn.release();
         return "Invalid E";
     }
     if (await bc.compare(userData.password, result[0].password)) {
         await conn.query(`UPDATE User SET auth_token = '${auth_token}' WHERE email = ${conn.escape(userData.email)}`);
+        conn.release();
         return {"userId": result[0].user_id, "token" : auth_token};
     } else {
+        conn.release();
         return "Invalid P";
     }
 };
 
+exports.getUser = async function (userId) {
+
+    console.log("Request to retrieve user info..");
+
+    const conn = await db.getPool().getConnection();
+    const id = conn.escape(userId);
+    const [result] = await conn.query(`SELECT name, city, country, email FROM User where user_id = ${id}`);
+    conn.release();
+    return result[0];
+}

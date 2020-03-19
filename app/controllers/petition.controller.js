@@ -21,8 +21,16 @@ exports.list = async function(req, res) {
 
     try {
         const result = await petition.getAll(queryParams);
+        let start = 0;
+        let finish = result.length;
+        if (queryParams.startIndex !== undefined ) {
+            start = parseInt(queryParams.startIndex);
+        }
+        if (queryParams.count !== undefined) {
+            finish = queryParams.count;
+        }
         res.status(200)
-            .send(result);
+            .send(result.slice(start, finish));
     } catch(err) {
         res.status(500)
             .send(`ERROR listing petitions: ${err}`);

@@ -5,8 +5,9 @@ exports.loginRequired = async function (req, res, next) {
     const token = req.headers['x-authorization'];
 
     try {
-        const result = await findUserByToken((token));
-        if (result === null) {
+        const [result] = await findUserByToken((token));
+        console.log(result);
+        if (result === undefined) {
             res.status(401)
                 .send("Unauthorized")
         } else {

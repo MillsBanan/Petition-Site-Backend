@@ -12,13 +12,13 @@ exports.create = async function(req, res) {
         "country": req.body.country
     };
 
-    // try {
-    //     //checkEmailValid(userData.email);
-    //     //await users.checkEmailInUse(userData.email);
-    // } catch {
-    //     res.status(400)
-    //         .send("Email address was invalid or in use!");
-    // }
+    try {
+        checkEmailValid(userData.email);
+        await users.checkEmailInUse(userData.email);
+    } catch {
+        res.status(400)
+            .send("Email address was invalid or in use!");
+    }
 
     try {
         let result = await users.insert(userData);

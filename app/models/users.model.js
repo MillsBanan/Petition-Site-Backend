@@ -53,5 +53,6 @@ exports.getUser = async function (userId) {
     const id = conn.escape(userId);
     const [result] = await conn.query(`SELECT name, city, country, email FROM User where user_id = ${id}`);
     conn.release();
+    console.log(result);
     return result[0];
 }

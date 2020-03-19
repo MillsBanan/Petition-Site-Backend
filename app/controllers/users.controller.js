@@ -98,6 +98,12 @@ exports.viewUser = async function (req, res) {
                 .send();
         } else {
             const result = await users.getUser(req.params.id);
+            console.log(result);
+            if (result === undefined) {
+                res.statusMessage = "Oops";
+                res.status(404)
+                    .send();
+            }
             if (!ownId) {
                 delete result.email;
             }

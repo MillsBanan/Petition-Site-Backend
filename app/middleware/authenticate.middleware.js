@@ -20,6 +20,25 @@ exports.loginRequired = async function (req, res, next) {
     }
 };
 
+exports.authUser = async function (req, res, next) {
+
+    const token = req.headers['x-authorization'];
+
+    try {
+        const [result] = await findUserByToken((token));
+        console.log(result);
+        if (result === undefined) {
+            next();
+        } else {
+            req.authenticatedUserId = result.user_id.toString();
+            next();
+        }
+    } catch(err) {
+        res.status(500)
+            .send(`ERROR authenticating user: ${err}`);
+    }
+};
+
 async function findUserByToken(authToken) {
     const conn = await db.getPool().getConnection();
 

@@ -7,38 +7,59 @@ exports.create = async function(req, res) {
     const userData = {
         "name": req.body.name,
         "email": req.body.email,
-        "password": req.body.email,
+        "password": req.body.password,
         "city": req.body.city,
         "country": req.body.country
     };
 
-    // try {
-    //     //checkEmailValid(userData.email);
-    //     //await users.checkEmailInUse(userData.email);
-    // } catch {
-    //     res.status(400)
-    //         .send("Email address was invalid or in use!");
-    // }
 
     try {
-        let result = await users.insert(userData);
-        result = {
-            "userId" : result
+        if (!userData.email.includes('@')) {
+            res.status(400)
+                .send("ERROR: Email not valid..");
+        } else if (userData.name === undefined) {
+            res.status(400)
+                .send('ERROR: Name field is mandatory');
+        } else if (userData.password === undefined) {
+            res.status(400)
+                .send('ERROR: Password field is mandatory');
+        } else {
+            let result = {"userId": await users.insert(userData)};
+            res.status(201)
+                .send(result);
         }
-        res.status(201)
-            .send(result);
     } catch(err) {
-        res.status(500)
-            .send(`ERROR creating user: ${err}`);
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(400)
+                .send('ERROR: Duplicate entry for email');
+        } else {
+            res.status(500)
+                .send(`ERROR creating user: ${err}`);
+        }
     }
 };
 
-function checkEmailValid(email) {
-    const re = /@/;
-    if (!(re.test(email))) {
-        throw "Email address invalid!";
-    }
-    if (userData.name === undefined || userData.password === undefined) {
-        throw "Username and password are mandatory fields!";
+exports.login = async function(req, res) {
+    console.log("Request to login to the server");
+
+    const userData = req.body;
+    try {
+        if (userData.email === undefined || userData.password === undefined) {
+            res.status(400)
+                .send("Username and password must not be left blank");
+        } else {
+            const result = await users.login(userData);
+            if (result === "Invalid") {
+                res.status(400)
+                    .send("ERROR: Invalid password");
+            } else {
+                res.status(200)
+                    .send(result);
+            }
+        }
+    } catch(err) {
+        res.status(500)
+            .send(`ERROR logging in: ${err}`);
     }
 }
+

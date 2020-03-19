@@ -21,14 +21,18 @@ exports.insert = async function(userData) {
     return result.insertId;
 };
 
-exports.checkEmailInUse = async function(email) {
+exports.login = async function(userData) {
 
-    console.log('Request to check if an email is in use!');
+    console.log("Request to login to the database");
 
     const conn = await db.getPool().getConnection();
-
-    const [result] = await conn.query(`SELECT * FROM User where email = ${email}`);
-    if (result.affectedRows !== 0) {
-        throw "Email in use!";
+    let auth_token = Date.now().toString();
+    auth_token = (await bc.hash(auth_token, 1)).slice(0,32);
+    const [result] = await conn.query(`SELECT user_id, password FROM User where email = ${conn.escape(userData.email)}`);
+    if (await bc.compare(userData.password, result[0].password)) {
+        await conn.query(`UPDATE User SET auth_token = '${auth_token}' WHERE email = ${conn.escape(userData.email)}`);
+        return {"userId": result[0].user_id, "token" : auth_token};
+    } else {
+        return "Invalid";
     }
 };

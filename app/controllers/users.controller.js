@@ -12,13 +12,13 @@ exports.create = async function(req, res) {
         "country": req.body.country
     };
 
-    try {
-        checkEmailValid(userData.email);
-        await users.checkEmailInUse(userData.email);
-    } catch {
-        res.status(400)
-            .send("Email address was invalid or in use!");
-    }
+    // try {
+    //     //checkEmailValid(userData.email);
+    //     //await users.checkEmailInUse(userData.email);
+    // } catch {
+    //     res.status(400)
+    //         .send("Email address was invalid or in use!");
+    // }
 
     try {
         let result = await users.insert(userData);
@@ -37,5 +37,8 @@ function checkEmailValid(email) {
     const re = /@/;
     if (!(re.test(email))) {
         throw "Email address invalid!";
+    }
+    if (userData.name === undefined || userData.password === undefined) {
+        throw "Username and password are mandatory fields!";
     }
 }

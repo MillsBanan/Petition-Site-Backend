@@ -87,8 +87,8 @@ exports.logout = async function(req, res) {
 
 };
 
-exports.viewUser = async function (req, res) {
-
-    const authUserId = req.authenticatedUserId;
-
-};
+// exports.viewUser = async function (req, res) {
+//
+//     const authUserId = req.authenticatedUserId;
+//
+// };

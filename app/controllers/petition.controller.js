@@ -30,7 +30,7 @@ exports.list = async function(req, res) {
             finish = queryParams.count;
         }
         res.status(200)
-            .send(result.slice(start, finish));
+            .send(result.slice(start, finish + 1));
     } catch(err) {
         res.status(500)
             .send(`ERROR listing petitions: ${err}`);

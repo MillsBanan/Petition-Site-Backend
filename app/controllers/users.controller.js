@@ -127,9 +127,8 @@ exports.patchUser = async function (req, res) {
     console.log('Request to patch user...');
 
     try {
-        if (req.body.password === undefined && req.body.currentPassword === undefined &&
-                req.body.name === undefined && req.body.email === undefined && req.body.city === undefined &&
-                req.body.country === undefined) {
+        if (req.body.password === undefined && req.body.name === undefined && req.body.email === undefined &&
+                    req.body.city === undefined && req.body.country === undefined) {
             res.status(400)
                 .send();
         }else if (req.params.id === undefined) {

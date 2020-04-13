@@ -113,16 +113,12 @@ exports.patchPetition = async function (req, res) {
                     req.body.closingDate === undefined) {
             res.status(400)
                 .send();
-        } else if (req.body.categoryId !== undefined) {
-            if (await petition.categoryInvalid(req.body.categoryId)) {
-                res.status(400)
-                    .send();
-            }
-        } else if (req.body.closingDate !== undefined) {
-            if (Date.now() > Date.parse(req.body.closingDate)) {
-                res.status(400)
-                    .send();
-            }
+        } else if (req.body.categoryId !== undefined && await petition.categoryInvalid(req.body.categoryId)) {
+            res.status(400)
+                .send();
+        } else if (req.body.closingDate !== undefined && Date.now() > Date.parse(req.body.closingDate)) {
+            res.status(400)
+                .send();
         } else {
             const result = await petition.update(req.body, req.params.id);
             if (result === "Ok") {

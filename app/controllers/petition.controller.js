@@ -55,34 +55,28 @@ function checkListQueryParams(queryParams) {
 exports.create = async function(req, res) {
 
     console.log('\nRequest to create a new petition...');
-
-    let body = req.body;
-    const auth_token = req.headers['x-authorization'];
-    console.log(auth_token);
+    let petitionData = req.body;
+    petitionData["authorId"] = req.authenticatedUserId;
 
     try {
-        checkDateTime(body.closingDate);
-    } catch {
-        res.status(400)
-            .send("Bruh");
-    }
-
-    try {
-        const result = await petition.insert(author_id, body);
-        res.status(200)
-            .send(result);
+        if (petitionData.title === undefined || petitionData.description === undefined ||
+                petitionData.categoryId === undefined || petitionData.closingDate === undefined) {
+            res.status(400)
+                .send();
+        } else if (Date.now() > Date.parse(petitionData.closingDate)) {
+            res.status(400)
+                .send();
+        } else if (await petition.categoryInvalid(petitionData.categoryId)) {
+            res.status(400)
+                .send();
+        } else {
+            const [result] = await petition.insert(petitionData);
+            res.status(200)
+                .send(result);
+        }
     } catch (err) {
         res.status(500)
             .send(`ERROR creating petition: ${err}`);
     }
 
 };
-
-function checkDateTime (dateTime) {
-
-    const date = dateTime.slice(0,10);
-    const time = dateTime.slice(11,19);
-    if (!(Date.now() < Date.parse(date + 'T' + time + 'Z'))) {
-        throw "Bruh";
-    }
-}

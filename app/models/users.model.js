@@ -73,6 +73,7 @@ exports.updateUser = async function (userData, userId) {
     delete userData.currentPassword;
     let sql = "UPDATE User SET ? WHERE user_id = ?";
     await conn.query(sql, [userData, userId]);
+    conn.release();
     return "Ok";
 
 };

@@ -57,27 +57,30 @@ exports.getAll = async function(queryParams) {
     return result;
 };
 
-exports.insert = async function (values) {
+exports.insert = async function (petitionData) {
 
     console.log("Request to insert a petition into the database...");
     const conn = await db.getPool().getConnection();
-
-    const insert_columns = 'title , description, author_id, category_id, created_date, closing_date';
-    const insert_values = `'${values.title}','${values.description}','${values.categoryId}','${values.closingDate}'`;
-
-    const query = `INSERT INTO Petition (${insert_columns}) VALUES (${insert_values})`;
-    console.log(query);
-    const [result] = await conn.query(query);
+    const inserts = [petitionData.title,
+                     petitionData.description,
+                     petitionData.authorId,
+                     petitionData.categoryId,
+                     new Date().toISOString().slice(0, 19).replace('T', ' '),
+                     petitionData.closingDate];
+    await conn.query('INSERT INTO Petition (title , description, author_id, category_id, created_date, closing_date) ' +
+        'VALUES (?)', [inserts]);
+    const result = await conn.query(`SELECT petition_id FROM Petition WHERE title = ?`, [petitionData.title]);
     conn.release();
-    return result;
+    return result[0];
 };
 
-exports.user_id_auth = async function (userToken) {
-    console.log("Checking if provided auth token is for a valid user");
+exports.categoryInvalid = async function (categoryId) {
+
+    console.log("Checking if categoryId is in DB...");
+
     const conn = await db.getPool().getConnection();
-
-    const [result] = await conn.query(`SELECT user_Id FROM User where auth_token = ${userToken}`);
-
+    const [result] = await conn.query(`SELECT name FROM Category WHERE category_id = ?`, [categoryId]);
     conn.release();
-    return result;
-};
+    return result.length === 0;
+
+}

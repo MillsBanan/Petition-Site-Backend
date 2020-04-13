@@ -81,7 +81,6 @@ exports.categoryInvalid = async function (categoryId) {
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query(`SELECT name FROM Category WHERE category_id = ?`, [categoryId]);
     conn.release();
-    console.log(result);
     return result.length === 0;
 
 };
@@ -127,7 +126,7 @@ exports.update = async function (petitionData, petitionId) {
         petitionData["closing_date"] = petitionData.closingDate;
         delete petitionData.closingDate;
     }
-    const petitionExists = await conn.query(`SELECT * FROM Petition WHERE petition_id = ?`, petitionId);
+    const [petitionExists] = await conn.query(`SELECT * FROM Petition WHERE petition_id = ?`, petitionId);
     if (petitionExists.length === 0) {
         conn.release();
         return "Doesn't exist"
@@ -136,4 +135,4 @@ exports.update = async function (petitionData, petitionId) {
         conn.release();
         return "Ok";
     }
-}
+};

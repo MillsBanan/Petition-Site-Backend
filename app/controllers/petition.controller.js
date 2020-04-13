@@ -71,7 +71,7 @@ exports.create = async function(req, res) {
                 .send();
         } else {
             const [result] = await petition.insert(petitionData);
-            res.status(200)
+            res.status(201)
                 .send(result);
         }
     } catch (err) {

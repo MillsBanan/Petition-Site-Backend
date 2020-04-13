@@ -72,7 +72,7 @@ exports.create = async function(req, res) {
         } else {
             const [result] = await petition.insert(petitionData);
             res.status(201)
-                .send(result);
+                .send({"petitionId": result["petition_id"]});
         }
     } catch (err) {
         res.status(500)
@@ -81,9 +81,7 @@ exports.create = async function(req, res) {
 };
 
 exports.listOne = async function (req, res) {
-
-    console.log("Request to get detailed info about petition...");
-
+    console.log("yeetus");
     try {
         if (req.params.id === undefined) {
             res.status(404)
@@ -94,8 +92,6 @@ exports.listOne = async function (req, res) {
                 res.status(404)
                     .send();
             } else {
-                console.log(result[0]);
-
                 res.status(200)
                     .send(result[0]);
             }
@@ -105,3 +101,27 @@ exports.listOne = async function (req, res) {
             .send();
     }
 };
+
+exports.update = async function (req, res) {
+    console.log("Request to update a petition");
+
+    try {
+        if (await petition.userIsNotAuthor) {
+            res.status(401)
+                .send();
+        } else if (req.body.title === undefined && req.body.description === undefined && req.body.categoryId === undefined &&
+                    req.body.closingDate === undefined) {
+            res.status(400)
+                .send();
+        } else if (await petition.categoryInvalid(req.body.categoryId)) {
+            res.status(400)
+                .send();
+        } else if (Date.now() > Date.parse(petitionData.closingDate)) {
+            res.status(400)
+                .send();
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+}

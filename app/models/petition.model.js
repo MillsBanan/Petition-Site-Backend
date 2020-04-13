@@ -87,10 +87,29 @@ exports.categoryInvalid = async function (categoryId) {
 
 exports.getOne = async function (petitionId) {
     console.log("Request to get one petitions info... ");
-
     const conn = await db.getPool().getConnection();
-    const [result] = await conn.query('SELECT * FROM Petition WHERE petition_id = ?', [petitionId]);
-    console.log(result);
+    const sql = 'SELECT ' +
+                'p.petition_id as petitionId, p.title as title, c.name as category, u.name as authorName,' +
+                'count(*) as signatureCount, p.description as description, p.author_id as authorId, ' +
+                'u.city as authorCity, u.country as authorCountry, p.created_date as createdDate, ' +
+                'p.closing_date as closingDate ' +
+                'FROM Petition p ' +
+                    'LEFT JOIN User u ' +
+                        'ON p.author_id = u.user_id ' +
+                    'LEFT JOIN Category c ' +
+                        'ON p.category_id = c.category_id ' +
+                    'LEFT JOIN Signature s ' +
+                        'ON p.petition_id = s.petition_id ' +
+                'WHERE p.petition_id = ?';
+    const [result] = await conn.query(sql, [petitionId]);
     conn.release();
     return result;
-}
+};
+
+exports.userIsNotAuthor = async function (userId, petitionId) {
+    console.log("Checking if user is author of petition");
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query('SELECT author_id FROM Petition WHERE petition_id = ?', [petitionId]);
+    conn.release();
+    return result["author_id"] !== userId;
+};

@@ -81,14 +81,15 @@ exports.logout = async function(req, res) {
             res.status(200)
                 .send();
         }
-    } catch {
-
+    } catch (err) {
+        res.status(500)
+            .send();
     }
 
 };
 
 exports.viewUser = async function (req, res) {
-    console.log("Yeet");
+    console.log("Request to view user...");
     const authUserId = req.authenticatedUserId;
     const ownId = authUserId === req.params.id;
     try {
@@ -115,6 +116,45 @@ exports.viewUser = async function (req, res) {
             }
             res.status(200)
                 .send(result);
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+};
+
+exports.patchUser = async function (req, res) {
+    console.log('Request to patch user...');
+
+    try {
+        if (req.params.id === undefined) {
+            res.status(400)
+                .send();
+        } else if (req.params.id !== req.authenticatedUserId) {
+            res.status(401)
+                .send();
+        } else if (req.body.email !== undefined && !req.body.email.includes('@')) {
+            res.status(400)
+                .send('Bad email');
+        } else if (req.body.password !== undefined && req.body.currentPassword === undefined) {
+            res.status(400)
+                .send();
+        } else if (req.body.password !== undefined && req.body.password.length === 0) {
+            res.status(400)
+                .send();
+        } else if (req.body.currentPassword !== undefined && req.body.currentPassword.length === 0) {
+            res.status(400)
+                .send();
+        } else {
+            const result = await users.updateUser(req.body, req.params.id);
+            console.log(result);
+            if (result === "Ok") {
+                res.status(200)
+                    .send();
+            } else {
+                res.status(400)
+                    .send();
+            }
         }
     } catch(err) {
         res.status(500)

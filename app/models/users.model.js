@@ -53,6 +53,26 @@ exports.getUser = async function (userId) {
     const id = conn.escape(userId);
     const [result] = await conn.query(`SELECT name, city, country, email FROM User where user_id = ${id}`);
     conn.release();
-    console.log(result);
     return result[0];
-}
+};
+
+exports.updateUser = async function (userData, userId) {
+    console.log("Request to update user...");
+
+    const conn = await db.getPool().getConnection();
+    if (userData.password !== undefined) {
+        const [storedHash] = await conn.query(`SELECT password FROM User where user_id = ?`, [userId]);
+        if (storedHash.length === 0) {
+            return "Invalid ID";
+        } else if (await bc.compare(userData.currentPassword, storedHash[0].password)) {
+            userData.password = await bc.hash(userData.password, 10);
+        } else {
+            return "Invalid password";
+        }
+    }
+    delete userData.currentPassword;
+    let sql = "UPDATE User SET ? WHERE user_id = ?";
+    await conn.query(sql, [userData, userId]);
+    return "Ok";
+
+};

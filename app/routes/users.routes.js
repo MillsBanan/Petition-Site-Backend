@@ -10,5 +10,6 @@ module.exports = function(app) {
     app.route(app.rootUrl + '/users/logout')
         .post(authenticate.loginRequired, users.logout);
     app.route(app.rootUrl + '/users/:id')
-        .get(authenticate.authUser, users.viewUser);
+        .get(authenticate.authUser, users.viewUser)
+        .patch(authenticate.authUser, users.patchUser);
 };

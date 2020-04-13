@@ -83,4 +83,14 @@ exports.categoryInvalid = async function (categoryId) {
     conn.release();
     return result.length === 0;
 
+};
+
+exports.getOne = async function (petitionId) {
+    console.log("Request to get one petitions info... ");
+
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query('SELECT * FROM Petition WHERE petition_id = ?', [petitionId]);
+    console.log(result);
+    conn.release();
+    return result;
 }

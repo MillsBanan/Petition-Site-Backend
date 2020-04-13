@@ -27,7 +27,7 @@ exports.list = async function(req, res) {
             start = parseInt(queryParams.startIndex);
         }
         if (queryParams.count !== undefined) {
-            finish = queryParams.count;
+            finish = parseInt(queryParams.count);
         }
         res.status(200)
             .send(result.slice(start, finish + 1));
@@ -78,5 +78,30 @@ exports.create = async function(req, res) {
         res.status(500)
             .send(`ERROR creating petition: ${err}`);
     }
+};
 
+exports.listOne = async function (req, res) {
+
+    console.log("Request to get detailed info about petition...");
+
+    try {
+        if (req.params.id === undefined) {
+            res.status(404)
+                .send();
+        } else {
+            const result = await petition.getOne(req.params.id);
+            if (result.length === 0) {
+                res.status(404)
+                    .send();
+            } else {
+                console.log(result[0]);
+
+                res.status(200)
+                    .send(result[0]);
+            }
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
 };

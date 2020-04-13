@@ -5,5 +5,8 @@ module.exports = function (app) {
     app.route(app.rootUrl + '/petitions')
         .get(petition.list)
         .post(auth.loginRequired, petition.create);
-
+    app.route(app.rootUrl + '/petitions/:id')
+        .get(petition.listOne);
+        // .patch(auth.authUser, petition.update)
+        // .delete(auth.authUser, petition.remove);
 };

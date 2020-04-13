@@ -102,26 +102,42 @@ exports.listOne = async function (req, res) {
     }
 };
 
-exports.update = async function (req, res) {
+exports.patchPetition = async function (req, res) {
     console.log("Request to update a petition");
 
     try {
-        if (await petition.userIsNotAuthor) {
-            res.status(401)
+        if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
+            res.status(403)
                 .send();
         } else if (req.body.title === undefined && req.body.description === undefined && req.body.categoryId === undefined &&
                     req.body.closingDate === undefined) {
             res.status(400)
                 .send();
-        } else if (await petition.categoryInvalid(req.body.categoryId)) {
-            res.status(400)
-                .send();
-        } else if (Date.now() > Date.parse(petitionData.closingDate)) {
-            res.status(400)
-                .send();
+        } else if (req.body.categoryId !== undefined) {
+            if (await petition.categoryInvalid(req.body.categoryId)) {
+                res.status(400)
+                    .send();
+            }
+        } else if (req.body.closingDate !== undefined) {
+            if (Date.now() > Date.parse(req.body.closingDate)) {
+                res.status(400)
+                    .send();
+            }
+        } else {
+            const result = await petition.update(req.body, req.params.id);
+            if (result === "Ok") {
+                res.status(200)
+                    .send();
+            } else if (result === "Doesn't exist") {
+                res.status(404)
+                    .send();
+            } else {
+                res.status(400)
+                    .send();
+            }
         }
     } catch(err) {
         res.status(500)
             .send();
     }
-}
+};

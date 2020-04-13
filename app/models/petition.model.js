@@ -81,6 +81,7 @@ exports.categoryInvalid = async function (categoryId) {
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query(`SELECT name FROM Category WHERE category_id = ?`, [categoryId]);
     conn.release();
+    console.log(result);
     return result.length === 0;
 
 };
@@ -111,5 +112,28 @@ exports.userIsNotAuthor = async function (userId, petitionId) {
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query('SELECT author_id FROM Petition WHERE petition_id = ?', [petitionId]);
     conn.release();
-    return result["author_id"] !== userId;
+    return result[0]["author_id"] !== parseInt(userId);
 };
+
+exports.update = async function (petitionData, petitionId) {
+    console.log("Request to update a petition...");
+
+    const conn = await db.getPool().getConnection();
+    if (petitionData.categoryId !== undefined) {
+        petitionData["category_id"] = petitionData.categoryId;
+        delete petitionData.categoryId;
+    }
+    if (petitionData.closingDate !== undefined) {
+        petitionData["closing_date"] = petitionData.closingDate;
+        delete petitionData.closingDate;
+    }
+    const petitionExists = await conn.query(`SELECT * FROM Petition WHERE petition_id = ?`, petitionId);
+    if (petitionExists.length === 0) {
+        conn.release();
+        return "Doesn't exist"
+    } else {
+        await conn.query('UPDATE Petition SET ? WHERE petition_id = ?', [petitionData, petitionId]);
+        conn.release();
+        return "Ok";
+    }
+}

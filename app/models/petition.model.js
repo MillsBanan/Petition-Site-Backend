@@ -143,11 +143,18 @@ exports.update = async function (petitionData, petitionId) {
 };
 
 exports.delete = async function (petitionId) {
-    console.log("Request to delete a petition and all of it's signatures...");
+    console.log("Deleting petition and all of it's signatures...");
     const conn = await db.getPool().getConnection();
-    console.log(petitionId);
     const [result] = await conn.query('DELETE p, s FROM Petition p LEFT JOIN Signature s ' +
                                       'ON p.petition_id = s.petition_id WHERE p.petition_id = ?', [petitionId]);
     conn.release();
     return result;
 };
+
+exports.getCategories = async function () {
+    console.log("Retrieving all categories from database...");
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query('SELECT category_id as categoryId, name FROM Category');
+    conn.release();
+    return result;
+}

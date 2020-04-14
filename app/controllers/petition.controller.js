@@ -166,3 +166,16 @@ exports.remove = async function (req, res) {
             .send();
     }
 };
+
+exports.listCategories = async function (req, res) {
+    console.log("Request to list all information about categories...");
+
+    try {
+        const result = await petition.getCategories();
+        console.log(result);
+        res.send(result);
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+};

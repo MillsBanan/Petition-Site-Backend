@@ -44,7 +44,7 @@ exports.getSignatures = async function (petitionId) {
 
 exports.signPetition = async function (userId, petitionId) {
     console.log("Signing petition...");
-    const dateSigned = new Date().toISOString().slice(0, 10) + ' 00:00:00';
+    const dateSigned = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const inserts = [userId, petitionId, dateSigned];
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query('INSERT INTO Signature (signatory_id, petition_id, signed_date) ' +

@@ -151,7 +151,7 @@ exports.remove = async function (req, res) {
         if (await petition.petitionNotExists(req.params.id)) {
             res.status(404)
                 .send();
-        } else if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
+        } else if (!await petition.userIsAuthor(req.authenticatedUserId, req.params.id)) {
             res.status(403)
                 .send();
         } else {

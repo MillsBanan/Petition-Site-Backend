@@ -86,6 +86,9 @@ exports.listOne = async function (req, res) {
         if (req.params.id === undefined) {
             res.status(404)
                 .send();
+        } else if (await petition.petitionNotExists(req.params.id)) {
+            res.status(404)
+                .send();
         } else {
             const result = await petition.getOne(req.params.id);
             if (result.length === 0) {
@@ -106,7 +109,10 @@ exports.patchPetition = async function (req, res) {
     console.log("Request to update a petition");
 
     try {
-        if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
+        if (await petition.petitionNotExists(req.params.id)) {
+            res.status(404)
+                .send();
+        } else if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
             res.status(403)
                 .send();
         } else if (req.body.title === undefined && req.body.description === undefined && req.body.categoryId === undefined &&
@@ -121,14 +127,37 @@ exports.patchPetition = async function (req, res) {
                 .send();
         } else {
             const result = await petition.update(req.body, req.params.id);
-            if (result === "Ok") {
+            if (result.affectedRows !== 0) {
                 res.status(200)
                     .send();
-            } else if (result === "Doesn't exist") {
+            } else {
                 res.status(404)
                     .send();
+            }
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+};
+
+exports.remove = async function (req, res) {
+    console.log("Request to delete a petition...");
+
+    try {
+        if (await petition.petitionNotExists(req.params.id)) {
+            res.status(404)
+                .send();
+        } else if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
+            res.status(403)
+                .send();
+        } else {
+            const result = await petition.delete(req.params.id);
+            if (result.affectedRows !== 0) {
+                res.status(200)
+                    .send();
             } else {
-                res.status(400)
+                res.status(404)
                     .send();
             }
         }

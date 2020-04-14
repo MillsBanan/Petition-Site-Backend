@@ -7,6 +7,6 @@ module.exports = function (app) {
         .post(auth.loginRequired, petition.create);
     app.route(app.rootUrl + '/petitions/:id')
         .get(petition.listOne)
-        .patch(auth.loginRequired, petition.patchPetition);
-        // .delete(auth.authUser, petition.remove);
+        .patch(auth.loginRequired, petition.patchPetition)
+        .delete(auth.loginRequired, petition.remove);
 };

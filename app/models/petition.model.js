@@ -108,10 +108,21 @@ exports.getOne = async function (petitionId) {
 
 exports.userIsNotAuthor = async function (userId, petitionId) {
     console.log("Checking if user is author of petition");
+    if (petitionId === undefined) {
+        return true;
+    }
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query('SELECT author_id FROM Petition WHERE petition_id = ?', [petitionId]);
     conn.release();
     return result[0]["author_id"] !== parseInt(userId);
+};
+
+exports.petitionNotExists = async function (petitionId) {
+    console.log("Checking if petition exists...");
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query('SELECT title FROM Petition WHERE petition_id = ?', [petitionId]);
+    conn.release();
+    return result.length === 0;
 };
 
 exports.update = async function (petitionData, petitionId) {
@@ -126,13 +137,17 @@ exports.update = async function (petitionData, petitionId) {
         petitionData["closing_date"] = petitionData.closingDate;
         delete petitionData.closingDate;
     }
-    const [petitionExists] = await conn.query(`SELECT * FROM Petition WHERE petition_id = ?`, [petitionId]);
-    if (petitionExists.length === 0) {
-        conn.release();
-        return "Doesn't exist"
-    } else {
-        await conn.query('UPDATE Petition SET ? WHERE petition_id = ?', [petitionData, petitionId]);
-        conn.release();
-        return "Ok";
-    }
+    const [result] = await conn.query('UPDATE Petition SET ? WHERE petition_id = ?', [petitionData, petitionId]);
+    conn.release();
+    return result;
+};
+
+exports.delete = async function (petitionId) {
+    console.log("Request to delete a petition and all of it's signatures...");
+    const conn = await db.getPool().getConnection();
+    console.log(petitionId);
+    const [result] = await conn.query('DELETE p, s FROM Petition p LEFT JOIN Signature s ' +
+                                      'ON p.petition_id = s.petition_id WHERE p.petition_id = ?', [petitionId]);
+    conn.release();
+    return result;
 };

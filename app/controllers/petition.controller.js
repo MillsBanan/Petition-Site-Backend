@@ -109,10 +109,13 @@ exports.patchPetition = async function (req, res) {
     console.log("Request to update a petition");
 
     try {
-        if (await petition.petitionNotExists(req.params.id)) {
+        if (req.params.id === undefined) {
+            res.status(400)
+                .send();
+        } else if (await petition.petitionNotExists(req.params.id)) {
             res.status(404)
                 .send();
-        } else if (await petition.userIsNotAuthor(req.authenticatedUserId, req.params.id)) {
+        } else if (!await petition.userIsAuthor(req.authenticatedUserId, req.params.id)) {
             res.status(403)
                 .send();
         } else if (req.body.title === undefined && req.body.description === undefined && req.body.categoryId === undefined &&
@@ -127,7 +130,7 @@ exports.patchPetition = async function (req, res) {
                 .send();
         } else {
             const result = await petition.update(req.body, req.params.id);
-            if (result.affectedRows !== 0) {
+            if (result.affectedRows === 1) {
                 res.status(200)
                     .send();
             } else {

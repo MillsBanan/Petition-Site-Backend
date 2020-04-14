@@ -106,15 +106,12 @@ exports.getOne = async function (petitionId) {
     return result;
 };
 
-exports.userIsNotAuthor = async function (userId, petitionId) {
+exports.userIsAuthor = async function (userId, petitionId) {
     console.log("Checking if user is author of petition");
-    if (petitionId === undefined) {
-        return true;
-    }
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query('SELECT author_id FROM Petition WHERE petition_id = ?', [petitionId]);
     conn.release();
-    return result[0]["author_id"] !== parseInt(userId);
+    return result[0]["author_id"] === parseInt(userId);
 };
 
 exports.petitionNotExists = async function (petitionId) {
@@ -157,4 +154,4 @@ exports.getCategories = async function () {
     const [result] = await conn.query('SELECT category_id as categoryId, name FROM Category');
     conn.release();
     return result;
-}
+};

@@ -7,7 +7,7 @@ exports.insert = async function(userData) {
     const conn = await db.getPool().getConnection();
 
     let insert_columns = 'name, email, password';
-    let insert_values = `${conn.escape(userData.name)}, ${conn.escape(userData.email)}, '${await bc.hash(userData.password, 10)}'`;
+    let insert_values = `${conn.escape(userData.name)}, ${conn.escape(userData.email)}, '${await bc.hash(userData.password, 5)}'`;
     if (userData.city !== undefined) {
         insert_columns += ', city';
         insert_values += `, ${conn.escape(userData.city)}`;
@@ -65,7 +65,7 @@ exports.updateUser = async function (userData, userId) {
         if (storedHash.length === 0) {
             return "Invalid ID";
         } else if (await bc.compare(userData.currentPassword, storedHash[0].password)) {
-            userData.password = await bc.hash(userData.password, 10);
+            userData.password = await bc.hash(userData.password, 5);
         } else {
             return "Invalid password";
         }

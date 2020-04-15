@@ -61,7 +61,7 @@ async function populateDefaultUsers() {
 
 async function changePasswordToHash(user, passwordIndex) {
     // TODO you need to implement "passwords.hash()" yourself, then uncomment the line below.
-    const saltRounds = 10;
+    const saltRounds = 5;
     user[passwordIndex] = await bc.hash(user[passwordIndex], saltRounds);
 
     // It is recommended you use a reputable cryptology library to do the actual hashing/comparing for you...

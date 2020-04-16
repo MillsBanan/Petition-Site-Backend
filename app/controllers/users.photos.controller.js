@@ -67,7 +67,10 @@ exports.deletePhoto = async function (req, res) {
     console.log("Request to delete a users photo...");
 
     try {
-        if (req.params.id !== req.authenticatedUserId) {
+        if (!await photo.userExists(req.params.id)) {
+            res.status(404)
+                .send();
+        } else if (req.params.id !== req.authenticatedUserId) {
             res.status(403)
                 .send();
         } else {

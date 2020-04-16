@@ -15,7 +15,7 @@ exports.getMimeType = function (filename) {
     const extension = filename.split('.').pop();
     if (extension === 'png') {
         return 'image/' + extension;
-    } else if (extension === 'jpg' || extension === 'jpg') {
+    } else if (extension === 'jpeg' || extension === 'jpg') {
         return 'image/jpeg';
     } else {
         return null;

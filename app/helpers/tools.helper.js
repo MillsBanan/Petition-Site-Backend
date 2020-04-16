@@ -17,6 +17,8 @@ exports.getMimeType = function (filename) {
         return 'image/' + extension;
     } else if (extension === 'jpeg' || extension === 'jpg') {
         return 'image/jpeg';
+    } else if (extension === 'gif') {
+        return 'image/gif';
     } else {
         return null;
     }

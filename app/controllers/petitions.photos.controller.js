@@ -43,15 +43,15 @@ exports.putPhoto = async function (req, res) {
     console.log("Request to upload photo for petition...");
 
     try {
-        if (!await photo.userIsAuthor(req.authenticatedUserId, req.params.id)) {
+        if (!await photo.petitionExists(req.params.id)) {
+            res.status(404)
+                .send();
+        } else if (!await photo.userIsAuthor(req.authenticatedUserId, req.params.id)) {
             res.status(403)
                 .send('Not Author');
         } else if (!tools.theMimeIsRight(req.headers["content-type"])) {
             res.status(400)
                 .send('BadMime');
-        } else if (!await photo.petitionExists(req.params.id)) {
-            res.status(404)
-                .send();
         } else {
             const filename = 'petition_' + req.params.id + '_' + req.authenticatedUserId +
                 new Date().toISOString().slice(0,19) + '.' + req.headers["content-type"].split('/')[1];

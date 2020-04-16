@@ -29,5 +29,6 @@ module.exports = function () {
     require('../app/routes/users.routes')(app);
     require('../app/routes/petitions.signatures.routes')(app);
     require('../app/routes/petitions.photos.routes')(app);
+    require('../app/routes/users.photos.routes')(app);
     return app;
 };

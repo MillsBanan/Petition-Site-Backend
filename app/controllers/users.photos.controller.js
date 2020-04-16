@@ -61,5 +61,33 @@ exports.putPhoto = async function (req, res) {
         res.status(500)
             .send();
     }
+};
 
+exports.deletePhoto = async function (req, res) {
+    console.log("Request to delete a users photo...");
+
+    try {
+        if (req.params.id !== req.authenticatedUserId) {
+            res.status(403)
+                .send();
+        } else {
+            const filename = await photo.removePhoto(req.params.id);
+            console.log(filename);
+            if (filename === 500) {
+                res.status(500)
+                    .send();
+            } else if (filename === 'null') {
+                res.status(404)
+                    .send();
+            } else {
+                fs.unlink(photosDirectory + filename);
+                console.log("File deleted!");
+                res.status(200)
+                    .send();
+            }
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
 };

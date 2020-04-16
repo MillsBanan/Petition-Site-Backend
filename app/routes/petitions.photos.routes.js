@@ -4,5 +4,6 @@ const auth = require('../middleware/authenticate.middleware');
 
 module.exports = function(app) {
     app.route(app.rootUrl + '/petitions/:id/photo')
-        .get(photo.getPhoto);
+        .get(photo.getPhoto)
+        .put(auth.loginRequired, photo.putPhoto);
 };

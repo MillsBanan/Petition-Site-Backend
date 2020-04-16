@@ -1,7 +1,8 @@
 const photo = require('../models/petitions.photos.model');
 const fs = require('mz/fs');
-const photosDirectory = __dirname + '../../../storage/photos/';
+const photosDirectory = __dirname + '/../../storage/photos/';
 const path = require('path');
+const tools = require('../helpers/tools.helper');
 
 exports.getPhoto = async function (req, res) {
     console.log('Request to view a petition photo...');
@@ -19,9 +20,11 @@ exports.getPhoto = async function (req, res) {
                 res.status(404)
                     .send();
             } else {
-                const mimeType = 'image/' + filename.split('.').pop();
-
-                if (await fs.exists(path.resolve(photosDirectory + filename))) {
+                const mimeType = tools.getMimeType(filename);
+                if (mimeType === null) {
+                    res.status(404)
+                        .send();
+                } else if (await fs.exists(path.resolve(photosDirectory + filename))) {
                     res.status(200)
                         .contentType(mimeType)
                         .sendFile(path.resolve(photosDirectory + filename));
@@ -35,3 +38,30 @@ exports.getPhoto = async function (req, res) {
         res.status(500)
     }
 };
+
+exports.putPhoto = async function (req, res) {
+    console.log("Request to upload photo for petition...");
+
+    try {
+        if (!await photo.userIsAuthor(req.authenticatedUserId, req.params.id)) {
+            res.status(403)
+                .send('Not Author');
+        } else if (!tools.theMimeIsRight(req.headers["content-type"])) {
+            res.status(403)
+                .send('BadMime');
+        } else {
+            const filename = 'petition_' + req.params.id + '_' + req.authenticatedUserId +
+                new Date().toISOString().slice(0,19) + '.' + req.headers["content-type"].split('/')[1];
+            req.pipe(fs.createWriteStream(photosDirectory + filename));
+            const result = await photo.updatePhoto(req.params.id, filename);
+            res.status(result)
+                .send();
+
+        }
+    } catch(err) {
+        res.status(500)
+            .send();
+    }
+
+};
+

@@ -30,22 +30,22 @@ exports.getAll = async function(queryParams) {
 
     query += ' GROUP BY p.petition_id';
 
-    switch (queryParams.sortBy) {
-        case "SIGNATURES_DESC":
-            query += ' ORDER BY count(*) DESC';
-            break;
+               switch (queryParams.sortBy) {
+                case "SIGNATURES_DESC":
+                    query += ' ORDER BY count(*) DESC';
+                    break;
 
-        case "SIGNATURES_ASC":
-            query += ' ORDER BY count(*) ASC';
-            break;
+                case "SIGNATURES_ASC":
+                    query += ' ORDER BY count(*) ASC';
+                    break;
 
-        case "ALPHABETICAL_DESC":
-            query += ' ORDER BY title DESC';
-            break;
+                case "ALPHABETICAL_DESC":
+                    query += ' ORDER BY title DESC';
+                    break;
 
-        case "ALPHABETICAL_ASC":
-            query += ' ORDER BY title ASC';
-            break;
+                case "ALPHABETICAL_ASC":
+                    query += ' ORDER BY title ASC';
+                    break;
 
         default:
             query += ' ORDER BY count(*) DESC';
@@ -154,4 +154,12 @@ exports.getCategories = async function () {
     const [result] = await conn.query('SELECT category_id as categoryId, name FROM Category');
     conn.release();
     return result;
+};
+
+exports.petitionClosed = async function (petitionId) {
+    console.log("Checking if petition has closed...");
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query('SELECT closing_date FROM Petition WHERE petition_id = ?', [petitionId]);
+    conn.release();
+    return result[0]["closing_date"] < Date.now();
 };

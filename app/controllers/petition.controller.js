@@ -118,8 +118,11 @@ exports.patchPetition = async function (req, res) {
         } else if (!await petition.userIsAuthor(req.authenticatedUserId, req.params.id)) {
             res.status(403)
                 .send();
+        } else if (await petition.petitionClosed(req.params.id)) {
+            res.status(403)
+                .send();
         } else if (req.body.title === undefined && req.body.description === undefined && req.body.categoryId === undefined &&
-                    req.body.closingDate === undefined) {
+            req.body.closingDate === undefined) {
             res.status(400)
                 .send();
         } else if (req.body.categoryId !== undefined && await petition.categoryInvalid(req.body.categoryId)) {

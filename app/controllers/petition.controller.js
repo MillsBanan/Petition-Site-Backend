@@ -60,7 +60,7 @@ exports.create = async function(req, res) {
 
     try {
         if (petitionData.title === undefined || petitionData.description === undefined ||
-                petitionData.categoryId === undefined || petitionData.closingDate === undefined) {
+                petitionData.categoryId === undefined) {
             res.status(400)
                 .send();
         } else if (Date.now() > Date.parse(petitionData.closingDate)) {

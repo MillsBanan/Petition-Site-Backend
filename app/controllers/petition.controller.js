@@ -16,7 +16,7 @@ exports.list = async function(req, res) {
         if (!queryParamsOk(queryParams)) {
             res.status(400)
                 .send();
-        } else if (await petition.categoryInvalid(queryParams.categoryId)) {
+        } else if (queryParams.categoryId !== undefined && await petition.categoryInvalid(queryParams.categoryId)) {
             res.status(400)
                 .send();
         } else {
